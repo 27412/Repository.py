@@ -1,0 +1,67 @@
+import streamlit as st
+import sympy as sp
+import numpy as np
+import matplotlib.pyplot as plt
+
+st.title("📊 Aplikasi Turunan Parsial & Keuntungan Cilok Harian")
+
+# Definisikan simbol
+x, y = sp.symbols('x y')
+
+# Input fungsi dari user
+fungsi_str = st.text_input("Masukkan fungsi f(x, y):", "5*x**2 + 4*x*y + 6*y**2 + 200")
+
+try:
+    # Parsing fungsi
+    f = sp.sympify(fungsi_str)
+    fx = sp.diff(f, x)
+    fy = sp.diff(f, y)
+
+    st.latex(f"f(x, y) = {sp.latex(f)}")
+    st.latex(r"\frac{\partial f}{\partial x} = " + sp.latex(fx))
+    st.latex(r"\frac{\partial f}{\partial y} = " + sp.latex(fy))
+
+    # Input nilai x dan y
+    x0 = st.number_input("Nilai x₀:", value=2.0)
+    y0 = st.number_input("Nilai y₀:", value=3.0)
+
+    # Evaluasi fungsi dan turunannya di titik (x0, y0)
+    f_val = f.subs({x: x0, y: y0})
+    fx_val = fx.subs({x: x0, y: y0})
+    fy_val = fy.subs({x: x0, y: y0})
+
+    st.write(f"Nilai fungsi di titik ({x0}, {y0}) = {f_val}")
+    st.write(f"Gradien di titik ({x0}, {y0}) = fx: {fx_val}, fy: {fy_val}")
+
+    st.subheader("🟦 Grafik Permukaan & Bidang Singgung")
+
+    # Plot permukaan dan bidang singgung
+    x_vals = np.linspace(x0 - 2, x0 + 2, 50)
+    y_vals = np.linspace(y0 - 2, y0 + 2, 50)
+    X, Y = np.meshgrid(x_vals, y_vals)
+
+    Z = sp.lambdify((x, y), f, 'numpy')(X, Y)
+    Z_tangent = float(f_val) + float(fx_val) * (X - x0) + float(fy_val) * (Y - y0)
+
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.7)
+    ax.plot_surface(X, Y, Z_tangent, color='red', alpha=0.5)
+    ax.set_title("Permukaan f(x, y) dan Bidang Singgungnya")
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    st.pyplot(fig)
+
+    # Tambahan: Analisis Keuntungan
+    st.subheader("💰 Analisis Keuntungan Harian")
+    penghasilan = 100_000
+    modal = 50_000
+    keuntungan = penghasilan - modal
+
+    st.write(f"Penghasilan per hari: Rp {penghasilan:,}")
+    st.write(f"Modal produksi (estimasi): Rp {modal:,}")
+    st.success(f"Keuntungan bersih per hari: Rp {keuntungan:,}")
+
+except Exception as e:
+    st.error(f"Terjadi kesalahan: {e}")
