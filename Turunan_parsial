@@ -3,7 +3,7 @@ import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
 
-st.title("📊 Aplikasi Turunan Parsial & Keuntungan Cilok Harian")
+st.title("Turunan_parsial")
 
 # Definisikan simbol
 x, y = sp.symbols('x y')
